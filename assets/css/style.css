@@ -1,0 +1,53 @@
+body {
+  font-family: 'Inconsolata', monospace;
+  background-color: #121212;
+}
+
+.head-content {
+  background-color: #FADA5E;
+  color:#121212;
+  border: 1px solid #FFF;
+}
+
+.schedule-content {
+  margin-bottom: 32px;
+}
+
+.table-head {
+  padding: 12px;
+  font-size: 18px;
+  background-color: #121212;
+  color: #fff;
+  border-radius: 3px 3px 0px 0px;
+}
+
+.row-head {
+  background-color:#FADA5E;
+  padding: 20px 12px 20px 12px;
+}
+
+.input-content {
+  border: 1px solid #FFF;
+}
+
+.btn-content {
+  background-color: #121212;
+  color: #FFF;
+}
+
+.btn-content:hover {
+  background-color: #FFF;
+  color: #121212;
+}
+
+table.table-bordered > thead > tr > th{
+  border:1px solid #FFF;
+}
+
+table.table-bordered > tbody > tr > th {
+  border:1px solid #FFF;
+}
+
+table.table-bordered > tbody > tr > td{
+  border:1px solid #FFF;
+}
