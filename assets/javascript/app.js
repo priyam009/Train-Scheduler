@@ -52,33 +52,22 @@ $("#submit-button").on("click", function() {
 
 database.ref().on("child_added", function(snapshot) {
 
-  console.log(snapshot.val().trainName);
+  var firstTrainTime = moment(snapshot.val().firstTrainTime, 'HH:mm').subtract(1, 'years');
+  
+  var timeDiff = moment().diff(moment(firstTrainTime), 'minutes');
 
-  var currentTime = moment().format('HH:MM');
-  // var firstTrainTime = moment(snapshot.val().firstTrainTime, 'HH:MM'); 
-  var firstTrainTime = moment(snapshot.val().firstTrainTime, 'HH:MM');
+  var minutesAway = snapshot.val().frequency - (timeDiff % snapshot.val().frequency);
 
-  console.log("currentTime", currentTime);
-  console.log("firstTrainTime", firstTrainTime);
-
-  // var timeDiff = currentTime.diff(firstTrainTime, 'minutes');
-  // console.log("timeDiff", timeDiff);
-
+  var nextTrain = moment().add(minutesAway, 'm').format('hh:mm a');
+  
   var trow = $("<tr>");
   var tdata1 = $("<th>" + snapshot.val().trainName + "</th>");
   var tdata2 = $("<td>" + snapshot.val().destination + "</td>");
   var tdata3 = $("<td>" + snapshot.val().frequency + "</td>");
-  var tdata4 = $("<td>" + snapshot.val().frequency + "</td>");
-  var tdata5 = $("<td>" + snapshot.val().frequency + "</td>");
+  var tdata4 = $("<td>" + nextTrain + "</td>");
+  var tdata5 = $("<td>" + minutesAway + "</td>");
 
   trow.append(tdata1, tdata2, tdata3, tdata4, tdata5);
   $("#add-train").append(trow);
 });
 
-/* <tr>
-<td>1</td>
-<td>Mark</td>
-<td>Otto</td>
-<td>@mdo</td>
-<td>@mdo</td>
-</tr> */
