@@ -17,7 +17,6 @@ var database = firebase.database();
 $("#submit-button").on("click", function() {
   event.preventDefault();
 
-
   var trainName = $("#trainName")
     .val()
     .trim();
@@ -31,43 +30,92 @@ $("#submit-button").on("click", function() {
     .val()
     .trim();
 
-  var addTrain = {
+  $(".train-form").trigger("reset");
+
+  database.ref().push({
     trainName: trainName,
     destination: destination,
     firstTrainTime: firstTrainTime,
     frequency: frequency
-  };
-
-  $(".train-form").trigger("reset");
-
-  console.log("addTrain", addTrain);
-
-  database.ref().push({
-    trainName : trainName,
-    destination : destination,
-    firstTrainTime : firstTrainTime,
-    frequency : frequency
   });
 });
 
-database.ref().on("child_added", function(snapshot) {
+var count = 0;
 
-  var firstTrainTime = moment(snapshot.val().firstTrainTime, 'HH:mm').subtract(1, 'years');
-  
-  var timeDiff = moment().diff(moment(firstTrainTime), 'minutes');
+database.ref().on("child_added", function(snapAdded) {
+  updateTable(snapAdded);
+});
 
-  var minutesAway = snapshot.val().frequency - (timeDiff % snapshot.val().frequency);
+function updateTable(snapshot) {
+  var firstTrainTime = moment(snapshot.val().firstTrainTime, "HH:mm").subtract(
+    1,
+    "years"
+  );
 
-  var nextTrain = moment().add(minutesAway, 'm').format('hh:mm a');
-  
+  var timeDiff = moment().diff(moment(firstTrainTime), "minutes");
+
+  var minutesAway =
+    snapshot.val().frequency - (timeDiff % snapshot.val().frequency);
+
+  var nextTrain = moment()
+    .add(minutesAway, "m")
+    .format("HH:mm");
+
   var trow = $("<tr>");
-  var tdata1 = $("<th>" + snapshot.val().trainName + "</th>");
+  trow.attr("id", snapshot.key + "row");
+  var tdata1 = $("<td>" + snapshot.val().trainName + "</td>");
   var tdata2 = $("<td>" + snapshot.val().destination + "</td>");
   var tdata3 = $("<td>" + snapshot.val().frequency + "</td>");
   var tdata4 = $("<td>" + nextTrain + "</td>");
+  tdata4.addClass(snapshot.key + "nextTrain");
   var tdata5 = $("<td>" + minutesAway + "</td>");
+  tdata5.addClass(snapshot.key + "minutesAway");
+  var tdata6 = $("<td>");
+  var input = $('<input type="checkbox">');
+  input.attr("id", snapshot.key);
+  tdata6.append(input);
 
-  trow.append(tdata1, tdata2, tdata3, tdata4, tdata5);
+  trow.append(tdata1, tdata2, tdata3, tdata4, tdata5, tdata6);
   $("#add-train").append(trow);
+
+  count++;
+}
+
+$(document).on("click", ".remove-button", function() {
+  database.ref().once("value", function(snap1) {
+    for (var key in snap1.val()) {
+      if ($("#" + key + ":checked").val()) {
+        database
+          .ref()
+          .child(key)
+          .remove();
+        $("#" + key + "row").remove();
+      }
+    }
+  });
 });
 
+setInterval(function() {
+  if (moment().format("ss") == 0) {
+    database.ref().once("value", function(snap) {
+      snap.forEach(function(childsnap) {
+        var firstTrainTime = moment(
+          childsnap.val().firstTrainTime,
+          "HH:mm"
+        ).subtract(1, "years");
+
+        var timeDiff = moment().diff(moment(firstTrainTime), "minutes");
+
+        var minutesAway =
+          childsnap.val().frequency - (timeDiff % childsnap.val().frequency);
+
+        var nextTrain = moment()
+          .add(minutesAway, "m")
+          .format("HH:mm");
+
+        $("." + childsnap.key + "nextTrain").text(nextTrain);
+        $("." + childsnap.key + "minutesAway").text(minutesAway);
+      });
+    });
+  }
+}, 1000);

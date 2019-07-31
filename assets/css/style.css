@@ -26,6 +26,11 @@ body {
   padding: 20px 12px 20px 12px;
 }
 
+.remove-content {
+  background-color: #FADA5E;
+  padding: 16px 16px;
+}
+
 .input-content {
   border: 1px solid #FFF;
 }
